@@ -1,0 +1,58 @@
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+
+--path.procfs=/host/proc: This flag specifies the path to the proc filesystem (/proc) of the host machine. Node Exporter uses the proc filesystem to collect various system metrics such as CPU usage, memory usage, and process information.
+
+--path.rootfs=/rootfs: This flag specifies the path to the root filesystem (/) of the host machine. Node Exporter uses the root filesystem to collect metrics related to disk space usage and filesystem statistics.
+
+--path.sysfs=/host/sys: This flag specifies the path to the sys filesystem (/sys) of the host machine. Node Exporter uses the sys filesystem to collect metrics related to kernel and hardware parameters.
+
+--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/): This flag specifies a regular expression pattern to exclude certain filesystem mount points from being collected by Node Exporter. In this case, it excludes directories such as /sys, /proc, /dev, /host, and /etc. The pattern ^/(sys|proc|dev|host|etc)($$|/) matches paths starting with any of these directories followed by an optional trailing slash.
+
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+
+--config.file=/etc/prometheus/prometheus.yml: This flag specifies the path to the Prometheus configuration file. In this case, it points to /etc/prometheus/prometheus.yml. This file contains the configuration settings for Prometheus, including scrape configurations, alerting rules, and other options.
+
+--storage.tsdb.path=/prometheus: This flag specifies the directory where Prometheus will store its time-series database (TSDB) data. The TSDB path is set to /prometheus, which is a volume mounted to the container. This ensures that Prometheus data is persisted even if the container is restarted or recreated.
+
+--web.console.libraries=/etc/prometheus/console_libraries: This flag specifies the directory containing the console libraries used by the Prometheus web UI. These libraries provide additional functionality and visualizations for the Prometheus UI.
+
+--web.console.templates=/etc/prometheus/consoles: This flag specifies the directory containing the console templates used by the Prometheus web UI. These templates define the layout and appearance of the Prometheus UI.
+
+--web.enable-lifecycle: This flag enables the HTTP endpoint for the Prometheus server's lifecycle management. This endpoint allows external tools to interact with the Prometheus server, such as reloading configuration or triggering rule evaluations.
+
+    global:
+    scrape_interval: 1m
+
+    scrape_configs:
+    - job_name: 'prometheus'
+        scrape_interval: 1m
+        static_configs:
+        - targets: ['localhost:9090']
+
+    - job_name: 'node'
+        static_configs:
+        - targets: ['node-exporter:9100']
+
+The scrape interval defines how often Prometheus will scrape metrics from the targets specified in the configuration.
+
+Prometheus Job:
+
+job_name: 'prometheus': This job configuration specifies the job name as 'prometheus'. This job is responsible for scraping metrics from the Prometheus server itself.
+scrape_interval: 1m: This setting overrides the global scrape interval for this specific job, setting it to scrape metrics every 1 minute.
+static_configs: This section defines static targets, which are configured manually and do not change dynamically.
+targets: ['localhost:9090']: This specifies that Prometheus should scrape metrics from the Prometheus server itself running on localhost at port 9090.
+Node Exporter Job:
+
+job_name: 'node': This job configuration specifies the job name as 'node'. This job is responsible for scraping metrics from Node Exporter.
+static_configs: Similar to the Prometheus job, this section defines static targets.
+targets: ['node-exporter:9100']: This specifies that Prometheus should scrape metrics from Node Exporter running on a container named node-exporter at port 9100.
